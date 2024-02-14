@@ -1,0 +1,14 @@
+dataset/
+dataset/application_test.csv
+dataset/application_train.csv
+dataset/bureau_balance.csv
+dataset/bureau.csv
+dataset/credit_card_balance.csv
+dataset/credit_card_balance.csv
+dataset/HomeCredit_columns_description.csv
+dataset/installments_payments.csv
+dataset/POS_CASH_balance.csv
+dataset/previous_application.csv
+dataset/sample_submission.csv
+dataset
+

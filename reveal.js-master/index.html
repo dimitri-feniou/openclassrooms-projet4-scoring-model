@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>Analyse des Données Open Food Facts</title>
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/dracula.css"> <!-- Thème Dracula pour Reveal.js -->
+	<link rel="stylesheet" href="plugin/highlight/zenburn.css"> <!-- Thème Monokai pour le code -->
+	<script src="plugin/highlight/highlight.js"></script>
+	<style>
+		.reveal figure,
+		.reveal section {
+			height: inherit;
+		}
+
+		.reveal .slides {
+			width: 100%;
+			height: 100%;
+			top: 0;
+			margin-top: 0;
+		}
+
+
+		.reveal .slides section,
+		.reveal .slides section>section {
+			padding: 0;
+		}
+
+		.reveal section img {
+			border: none;
+			margin: 0;
+		}
+
+		.reveal img,
+		.reveal video,
+		.reveal iframe {
+			max-height: 100%;
+			height: 100%;
+		}
+
+
+		.reveal figure img {
+			box-shadow: none;
+			max-width: 100%;
+			object-fit: contain;
+		}
+
+
+		.reveal figcaption {
+			display: block;
+			position: absolute;
+			margin: auto;
+			width: 96%;
+			left: 0;
+			text-align: center;
+			bottom: 1em;
+			height: auto;
+			background-color: white;
+			color: black;
+			font-size: smaller;
+			padding-left: 2%;
+			padding-right: 2%;
+			opacity: 0;
+		}
+
+		.reveal figcaption:hover {
+			opacity: .9;
+		}
+
+		.logo-openclassrooms {
+			position: absolute;
+			bottom: 10px;
+			left: 20px;
+			z-index: 30;
+			position: absolute;
+			left: 16px;
+			bottom: 16px;
+			z-index: 10;
+		}
+
+		.logo-openclassrooms img {
+			height: 5vw;
+			width: 5vw
+		}
+
+		dt {
+			font-size: 30px;
+			/* Taille du texte pour les termes */
+			font-weight: bold;
+		}
+
+		dd {
+			font-size: 25px;
+			/* Taille du texte pour les définitions */
+			margin-bottom: 30px;
+			/* Espacement après chaque définition */
+		}
+
+		/* Ajustement des images */
+		#SanteImage {
+			width: 80vw;
+			/* Ajuste la largeur à 50% de la largeur de la fenêtre du navigateur */
+			height: auto;
+			/* Ajuste la hauteur automatiquement pour maintenir le ratio d'aspect */
+		}
+
+		#SchemaImage {
+			width: 15vw;
+			/* Ajuste la largeur à 50% de la largeur de la fenêtre du navigateur */
+			height: 27vw;
+			/* Ajuste la hauteur automatiquement pour maintenir le ratio d'aspect */
+		}
+
+		#SanteImage {
+			width: 90vw;
+			/* Ajuste la largeur à 50% de la largeur de la fenêtre du navigateur */
+			height: auto;
+			/* Ajuste la hauteur automatiquement pour maintenir le ratio d'aspect */
+		}
+
+		#NutriImage {
+			max-width: 70%;
+			/* Ajuste la largeur maximale à 80% de son conteneur */
+			max-height: 60%;
+			/* Ajuste la hauteur maximale à 100% de son conteneur */
+			object-fit: contain;
+			/* Assure que tout le contenu de l'image est visible */
+		}
+
+		#CountriesImage {
+			max-width: 90%;
+			/* Ajuste la largeur maximale à 80% de son conteneur */
+			max-height: 20%;
+			/* Ajuste la hauteur maximale à 100% de son conteneur */
+			object-fit: contain;
+			/* Assure que tout le contenu de l'image est visible */
+			border: none;
+			float: left;
+		}
+
+		#Heatmap {
+			max-width: 90%;
+			/* Ajuste la largeur maximale à 80% de son conteneur */
+			max-height: 80%;
+			/* Ajuste la hauteur maximale à 100% de son conteneur */
+			object-fit: contain;
+			/* Assure que tout le contenu de l'image est visible */
+		}
+
+		#MissingDataframe {
+			width: 20vw;
+			/* Ajuste la largeur à 50% de la largeur de la fenêtre du navigateur */
+			height: 50%;
+			/* Ajuste la hauteur automatiquement pour maintenir le ratio d'aspect */
+			float: left;
+		}
+
+		#RMSE {
+			width: 50vw;
+			/* Ajuste la largeur à 50% de la largeur de la fenêtre du navigateur */
+			height: 50%;
+			/* Ajuste la hauteur automatiquement pour maintenir le ratio d'aspect */
+			float: left;
+		}
+
+		#acp_f1 {
+			max-width: 100%;
+			/* Ajuste la largeur maximale à 80% de son conteneur */
+			max-height: 70%;
+			/* Ajuste la hauteur maximale à 100% de son conteneur */
+			object-fit: contain;
+			/* Assure que tout le contenu de l'image est visible */
+		}
+
+		#acp_f3 {
+			max-width: 100%;
+			/* Ajuste la largeur maximale à 80% de son conteneur */
+			max-height: 60%;
+			/* Ajuste la hauteur maximale à 100% de son conteneur */
+			object-fit: contain;
+			/* Assure que tout le contenu de l'image est visible */
+		}
+
+		#acp_individu {
+			max-width: 100%;
+			/* Ajuste la largeur maximale à 80% de son conteneur */
+			max-height: 90%;
+			/* Ajuste la hauteur maximale à 100% de son conteneur */
+			object-fit: contain;
+			/* Assure que tout le contenu de l'image est visible */
+		}
+
+		.iframes-container {
+			display: flex;
+			flex-direction: column;
+			/* Si vous avez un titre et un paragraphe au-dessus */
+			justify-content: flex-start;
+			/* Alignez les enfants en haut */
+			align-items: center;
+			/* Centre les enfants horizontalement */
+			height: 100%;
+			/* Laissez la hauteur s'adapter au contenu */
+		}
+
+		.iframes-container iframe {
+			width: 100%;
+			/* Prend la largeur complète de la section */
+			max-height: 80%;
+			/* Utilisez max-height pour une meilleure adaptabilité */
+			border: none;
+			/* Supprime la bordure de l'iframe */
+		}
+
+		.section-filter-ul {
+			font-size: 23px;
+			text-align: left;
+			/* Aligns text to the left for all <ul> with this class */
+		}
+
+		.section-filter-li {
+			text-align: left;
+			/* This will align the text to the right for <li> */
+		}
+	</style>
+
+
+
+<body>
+	<div class="reveal">
+		<div class="logo-openclassrooms">
+			<!-- Ajout du logo OpenClassrooms sur toutes les diapositives -->
+			<img src="https://upload.wikimedia.org/wikipedia/fr/0/0d/Logo_OpenClassrooms.png" alt="Logo OpenClassrooms">
+		</div>
+		<div class="slides">
+			<section>
+				<section>
+					<h4><b>Projet 3 Préparez des données pour un organisme de santé publique</b></h3>
+
+						<img src="https://www.hospitalia.fr/photo/art/grande/54117300-40801349.jpg?v=1614005985"
+							alt="Open Food Facts" id="SanteImage">
+				</section>
+
+				<section style="text-align: left;">
+					<h3>Présentation du projet</h3>
+
+					<ul>
+						<b>
+							<li>Contexte:</li>
+						</b>
+						L'Agence Santé Publique France dispose d'une <b>base de donnée</b> pour connaître la qualité
+						nutritionnelle de produits</p>
+					</ul>
+					<ul class="left-aligned-text">
+						<li><b>Objectifs: Exploration du jeux de données</b>
+							<ol>
+								<li>Nettoyer les données</li>
+								<li>Analyse des données</li>
+								<li>Présentation des principes du RGPD</li>
+							</ol>
+						</li>
+					</ul>
+					<p>Apporter une conclusion sur la faisabilité d'un projet d'application </p>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h3>Présentation du jeu de données open food fact</h3>
+					<p>Jeux de données contenant <b>320772 lignes </b> et <b>162 colonnes</b> </p>
+					<li style="text-align: left;"><b>Informations disponibles :</b>
+						<ol>
+							<li>Les informations sur la contribution à la base de données (créateur,date
+								d'ajout,idproduit)</li>
+							<li>Informations sur le produits (nom,origine,marques,quantité)</li>
+							<li>Informations sur la composition du produit (additifs,composition nutritif)</li>
+							<li>Information sur la valeurs nutritifs (Nutri-Score)</li>
+						</ol>
+					</li>
+					</ul>
+				</section>
+				<section>
+					<h4>Présentation du jeu de données open food fact</h4>
+					<p><b>Les valeurs manquantes</b></p>
+					<dd style="font-size: 20px;">76% des valeurs du jeu de données est manquante</dd>
+
+					<div class="iframes-container">
+						<iframe id="PieImage2" src="./img_presentation/representation_missing_column.html"  data-preload></iframe>></iframe>
+
+					</div>
+				</section>
+				<section>
+					<h3>Présentation du jeu de données open food fact</h3>
+					<p><b>Quesce-ce que le Nutri-Score ?</b></p>
+					<img id="NutriImage"
+						src="https://assets-global.website-files.com/5e4d08c15370e9073c634a54/62e3febf1c959db9cb85c2a6_le-nutri-score-debarque-chez-foodles-calcul-food-in-action.jpeg"
+						alt="">
+				</section>
+			</section>
+			<section>
+				<section>
+					<h4>Nettoyage des données</h4>
+					<p><b>Schéma nettoyage des données</b></p>
+					<img id="SchemaImage" src="./img_presentation/schema_clean_function.png" alt="">
+
+				</section>
+
+				<section>
+					<h4>Nettoyage des données</h4>
+					<p><b>Filtrage de nos données</b></p>
+					<p style="text-align: left;">Choix des colonnes :</p>
+
+					<ul class="section-filter-ul">
+						<li class="section-filter-li">
+							<strong>Information Nutritionnel</strong> présent dans le calcul du nutri-score:
+							<ul class="section-filter-ul">
+								<li class="section-filter-li">'energy_100g' (transformation kj en kcal)</li>
+								<li class="section-filter-li">'proteins_100g'</li>
+								<li class="section-filter-li">'sugars_100g'</li>
+								<li class="section-filter-li">'fiber_100g'</li>
+								<li class="section-filter-li">'salt_100g'</li>
+							</ul>
+						</li>
+						<li class="section-filter-li">
+							<strong>Informations générale</strong> sur le produit:
+							<ul class="section-filter-ul">
+								<li class="section-filter-li">'code'</li>
+								<li class="section-filter-li">'url'</li>
+								<li class="section-filter-li">'product_name'</li>
+								<li class="section-filter-li">'brands'</li>
+								<li class="section-filter-li">'countries_fr'</li>
+							</ul>
+						</li>
+						<li class="section-filter-li">
+							<strong>Informations annexes</strong> sur le produit:
+							<ul class="section-filter-ul">
+								<li class="section-filter-li">'additives_n'</li>
+								<li class="section-filter-li">'additives_fr'</li>
+								<li class="section-filter-li">'quantity'</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section>
+					<h4>Nettoyage des données</h4>
+					<p><b>Analyse et nettoyage de nos données Filtrés</b></p>
+					<li class="section-filter-li" style="font-size: 20px;">
+						Supression des produits non vendu en France </li>
+					<img id="CountriesImage" src="./img_presentation/countries_screen.png" alt="">
+					<li class="section-filter-li" style="font-size: 20px;">
+						Supression des valeurs n'ayant pas de nom de produit et de marque </li>
+					<li class="section-filter-li" style="font-size: 20px;">
+						Visualisation du taux de complétion de nos données filtrés </li>
+					<img id="MissingDataframe" src="./img_presentation/missing_filetered.png" alt="">
+				</section>
+				<section>
+					<h4>Nettoyage des données</h4>
+					<p><b>Les types de données manquantes</b></p>
+					<dl>
+						<dt><strong>MCAR (Missing Completely at Random)</strong></dt>
+						<dd>Une donnée est MCAR, c’est-à-dire manquante de façon complètement aléatoire si la
+							probabilité d’absence est la
+							même pour toutes les observations. Cette probabilité ne dépend donc que de paramètres
+							extérieurs indépendants de
+							cette variable.</dd>
+
+						<dt><strong>MAR (Missing At Random)</strong></dt>
+						<dd>Les valeurs manquantes dépendent des autres données observées, mais pas des données
+							manquantes.</dd>
+
+						<dt><strong>MNAR (Missing Not At Random)</strong></dt>
+						<dd>La donnée est manquante de façon non aléatoire si la probabilité d’absence dépend de la
+							variable en question.
+						</dd>
+					</dl>
+
+
+				</section>
+				<section>
+					<h4>Nettoyage des données</h4>
+					<p><b>Analyse de nos valeurs manquantes</b></p>
+					<img id="Heatmap" src="./img_presentation/heatmap.png" alt="">
+				</section>
+				<section>
+					<h4>Nettoyage des données</h4>
+					<p><b>Imputation de nos données </b></p>
+					<dl>
+						<dt><strong>Méthode d'imputation Variable Numérique</strong></dt>
+						<dd style="font-size: 20px;">- KNN (k-nearest neighbors) Imputer<br>
+							Méthode d'imputation qui utilise les k plus proche voisins pour remplir les valeurs
+							manquantes<br>
+							- Calcul du RMSE pour déterminer la valeur de K pour nos valeurs
+						</dd>
+
+						<dt><strong>Méthodes d'imputation Variable Catégorielle</strong></dt>
+						<dd style="font-size: 20px;">- Simple Imputer : Statégie d'imputation par la valeur la plus
+							fréquente </dd>
+					</dl>
+					<div class="iframes-container">
+						<iframe id="RMSE" src="./img_presentation/rmse.html"></iframe>
+
+					</div>
+				</section>
+				<section>
+					<h4>Nettoyage des données</h4>
+					<p><b>Choix de la méthodes de détection d'outliers</b></p>
+					<dd style="text-align: left;"><strong>Méthode IQR</strong>: Méthode adapter pour nos données
+						asymétrique et simple d'interprétation. <br>Suppressions des valeurs >0 et <100 </dd>
+							<div class="iframes-container">
+								<iframe id="RMSE" src="./img_presentation/outliers_method.html"></iframe>
+							</div>
+				</section>
+				<section>
+					<h4>Nettoyage des données</h4>
+					<p><b>Function pipeline de nettoyage</b></p>
+					<pre><code data-trim data-noescape>
+						def pipeline_clean_dataset(output_csv_filename='test_pipeline.csv'):
+								# Import dataset
+								print("Processing....Import du dataframe")
+								df_food = pd.DataFrame()
+								df_food = import_dataset(df_food)
+								initial_row_count = len(df_food)
+								print("Processing....Convertion des types")
+								# Convert data types
+								df_converted, date_list, specific_dtype = convert_types(
+								df_food, "dataset/fr.openfoodfacts.org.products.csv")
+								
+								# Convert date columns
+								df_converted = convert_date(date_list, df_converted)
+								
+								# Convert geocode columns
+								df_converted = convert_geocode(specific_dtype, df_converted)
+								
+								# Replace specific missing values
+								
+								print("Processing....Suppression des valeurs nulles")
+								# Drop rows with missing values in a specific column
+								df_converted = drop_missing_values_column(df_converted, 'code')
+								# Drop Nan Values product_name column
+								df_converted = drop_missing_values_column(
+								df_converted, 'product_name')
+								df_converted = drop_missing_values_column(
+								df_converted, 'brand')
+								
+								print("Processing....Filtrage des données")
+								filter_dataframe(df_converted, ['code', 'url', 'product_name', 'brands', 'countries_fr', 'nutrition-score-fr_100g',
+								'nutrition_grade_fr','additives_n', 'additives_fr', 'quantity', 'energy_100g', 'proteins_100g', 'sugars_100g',
+								'fiber_100g', 'salt_100g'])
+								# Call the function to drop rows not containing 'France'
+								
+								df_filtered = drop_rows_not_containing_substring(
+								df_converted, 'countries_fr', 'France')
+								print("Processing.... Imputation des données nulles")
+								# Impute missing values
+								df_imputed = impute_missing_values(df_filtered)
+								
+								# Columns to check for the value range
+								range_check_columns = ['proteins_100g',
+								'sugars_100g', 'fiber_100g', 'salt_100g']
+								
+								# Applying the function to the dataset
+								df_without_out_range, percentage_removed_range_check = drop_values_out_of_range(df_imputed, range_check_columns)
+								
+								final_row_count = len(df_without_out_range)
+								print(f"Final number of rows after processing: {final_row_count}")
+								# Calculate the percentage of data cleaned
+								percentage_cleaned = (final_row_count / initial_row_count) * 100
+								print(f"Percentage of data cleaned: {percentage_cleaned:.2f}%")
+								# Save the processed DataFrame to a CSV file
+								df_without_out_range.to_csv(output_csv_filename, index=False)
+								print(f"Processed data saved to {output_csv_filename}")
+								
+								return initial_row_count, final_row_count, df_without_out_range, percentage_cleaned
+								
+								
+								# Run the main process
+								initial_count, final_count = pipeline_clean_dataset()
+								print(f"Lignes au début: {initial_count}, Lignes à la fin: {final_count}, Données nettoyées: {percentage_cleaned:.2f}%")
+						    </code></pre>
+					<dd style="text-align: left;"><strong>Nombre de ligne après nettoyage des données: </strong>85391
+						<br>
+						<strong>Pourcentage de données de données nettoyées: </strong>26%
+
+
+				</section>
+
+
+
+			</section>
+			<section>
+				<section>
+					<h4>Analyse exploratoire du jeu de donnée</h4>
+					<p><b>Analyse univariée : variable numérique</b></p>
+					<div class="iframes-container">
+						<iframe id="PieImage2" src="./img_presentation/distribution.html"></iframe>
+
+					</div>
+				</section>
+				<section>
+					<h4>Analyse exploratoire du jeu de donnée</h4>
+					<p><b>Analyse univariée : variable catégorielle</b></p>
+					<div class="iframes-container">
+						<iframe src="./img_presentation/marque.html"></iframe>
+
+					</div>
+				</section>
+				<section>
+					<h4>Analyse exploratoire du jeu de donnée</h4>
+					<p><b>Analyse univariée : variable numérique/catégorielle</b></p>
+					<div class="iframes-container">
+						<iframe src="./img_presentation/grades_nutrion.html"></iframe>
+					</div>
+				</section>
+				<section>
+					<h4>Analyse exploratoire du jeu de donnée</h4>
+					<p><b>Analyse Bivariée : Matrice des corrélation méthode de spearman</b></p>
+					<div class="iframes-container">
+						<iframe src="./img_presentation/corr_var.html"></iframe>
+					</div>
+				</section>
+				<section>
+					<h4>Analyse exploratoire du jeu de donnée</h4>
+					<p><b>Analyse Bivariée : Matrice des corrélation catégorielle V de Cramer</b></p>
+					<div class="iframes-container">
+						<iframe src="./img_presentation/corr_cat.html"></iframe>
+					</div>
+				</section>
+				<section>
+					<h4>Analyse exploratoire du jeu de donnée</h4>
+					<p><b>Analyse Bivariée : Graphique numérique/numérique</b></p>
+					<div class="iframes-container">
+						<iframe src="./img_presentation/bivarie_num_cat.html"></iframe>
+					</div>
+				</section>
+				<section>
+					<h4>Analyse exploratoire du jeu de donnée</h4>
+					<p><b>Analyse multivariée : Anova à 1 facteur </b></p>
+					<dt style="text-align: left;"><strong>Problématique</strong> : Le nombre d'additifs a-t-il un impact
+						sur note obtenu ?</dt>
+
+					<dt style="text-align: left;"><strong>Anova</strong> :</dt>
+					<dd style="text-align:left">Test statistique pour déterminer si il y'a des différences entre les
+						notes du nutri-score</dd>
+					<dt style="text-align: left;"><strong>Test Kruskal Walis:</strong></dt>
+					<dd style="text-align:left">Compare s'il y'a différences entre les médianes des groupes</dd>
+					<dt style="text-align: left;"><strong>Test Epsilon carré:</strong>
+					<dd style="text-align:left">Détermine si il existe une différence significatives entre les groupes
+					</dd>
+					</dt>
+					<dt style="text-align: left;"><strong>Résultats des tests:</strong>
+					<dd style="text-align:left">Les test effectuer indique que les groupes diffèrent et que le nombre
+						d'additifs a un impact modérée sur la note obtenu </dd>
+
+				</section>
+				<section>
+					<h4>Analyse exploratoire du jeu de donnée</h4>
+					<p style="font-size: 20px;"><b>Analyse multivariée : Analyse en Composantes Principales (ACP) </b>
+					</p>
+					<p style="text-align:left;font-size: 16px;"><b>Choix du nombre de composantes :</b> 4 (70% de la
+						variance expliquée) </p>
+					<p style="text-align:left;font-size: 16px;"><b>Variables bien représentées sur F1 :</b>
+						nutrition-score-fr,Nombre_additifs,sucre_100g
+					<p style="text-align:left;font-size: 16px;"><b>Variables bien représentées sur F2 :</b>
+						proteines_100g,sel_100g
+					</p>
+					<img id="acp_f1" src="./img_presentation/acp_f1_f2.png" alt="">
+
+				</section>
+				<section>
+					<h4>Analyse exploratoire du jeu de donnée</h4>
+					<p><b>Analyse multivariée : Analyse en Composantes Principales (ACP) </b></p>
+					<p style="text-align:left;font-size: 16px;"><b>Variables bien représentées sur F3 :</b>
+						fibres_100g </p>
+					<p style="text-align:left;font-size: 16px;"><b>Variables bien représentées sur F4 :</b>
+						energy_100g </p>
+
+					<img id="acp_f3" src="./img_presentation/acp_f3_f4.png" alt="">
+
+				</section>
+				<section>
+					<h4>Analyse exploratoire du jeu de donnée</h4>
+					<p><b>Analyse multivariée : Analyse en Composantes Principales (ACP) </b></p>
+					<img id="acp_individu" src="./img_presentation/acp_individu.png" alt="">
+
+				</section>
+				<section>
+					<h4>Respect du RGPD</h4>
+					<p><b> Principe du Règlement Général sur la Protection des Données </b></p>
+					<dd style="text-align:left">Le RGPD législation de l'Union européenne qui vise à protéger la vie
+						privée et les données personnelles des individus </dd>
+					<dt style="text-align: left;font-size: 20px;"><strong>Transparence</strong>
+					<dd style="text-align:left;font-size: 18px;">traiter les données personnelles de manière légale et
+						transparente pour
+						l'individu et avec son concentement. </dd>
+					<dt style="text-align: left;font-size: 20px;"><strong>Limitation de la conservation</strong>
+					<dd style="text-align:left;font-size: 18px;">Le principe de conservation stipule que les données
+						personnelles doivent être conservées pendant une durée limitée.Les organisations doivent définir
+						des périodes de conservation pour les données personnelles qu’elles traitent et
+						supprimer les données personnelles lorsque la période de conservation est terminée.</dd>
+					<dt style="text-align: left;font-size: 20px;"><strong>Exactitude</strong>
+					<dd style="text-align:left;font-size: 18px;">Maintenir l'exactitude des données personnelles et les
+						mettre à jour au besoin.</dd>
+					<dt style="text-align: left;font-size: 20px;"><strong>confidentialité</strong>
+					<dd style="text-align:left;font-size: 18px;">garantir une sécurité appropriée des données à
+						caractère personnel, y compris la protection contre le traitement non
+						autorisé ou illicite et contre la perte</dd>
+				</section>
+				<section>
+					<h4>Respect du RGPD</h4>
+					<p><b> Principe du RGPD sur nos données </b></p>
+					<ol style="text-align: left;">
+						<p style="text-align: left;font-size: 20px;"><i>Nos données ne relèvent pas du cadre du RGPD :</i></p>
+						<li style="text-align: left;font-size: 20px;"><strong>Absence de Données Personnelles</strong></li>
+						<p style="font-size: 20px;">Données open source n'incluent pas de données personnelles ou d'informations permettant d'identifier directement ou
+							indirectement une personne.</p>
+						<li style="text-align: left;font-size: 20px;"><strong>Nature Publique des Données</strong></li>
+						<p style="font-size: 20px;">Les données Open Food Facts sont conçues pour être partagées
+							publiquement et sont généralement relatives aux produits
+							alimentaires eux-mêmes, telles que les ingrédients, les valeurs nutritionnelles et les
+							labels, qui ne sont pas
+							considérés comme des données personnelles.</p>
+				
+						
+							<li style="text-align: left;font-size: 20px;"><strong>Transparence et Consentement</strong></li>
+							<p style="font-size: 20px;">Les contributeurs à la base de données Open Food Facts fournissent des informations sur les produits de manière
+							volontaire et dans le cadre d'un projet collaboratif.</p>
+
+					</ol>
+
+				</section>
+					<section>
+						<h4>Conclusion nettoyage et analyse de donnée de la base Open food Act</h4>
+						<p><b> Faisabilité de l’application de Santé publique France</b></p>
+						<ol style="text-align: left;">
+							<li style="text-align: left;font-size: 20px;"><strong>Qualité et couverture des données</strong></li>
+							<p style="font-size: 20px;">Base de données avec 8500 produits.Les données recouvrent après nettoyage une large variétés de produits et des marques disponible sur le marchés français.</p>
+							<p style="font-size: 20px;"></p>
+							<li style="text-align: left;font-size: 20px;"><strong>Simplicité des données</strong></li>
+							<p style="font-size: 20px;">Contient seulement les informations primordiale,valeur nutritive,nutri-score,image produit,afin de rendre l'application plus accessible aux consommateurs.  </p>
+							<li style="text-align: left;font-size: 20px;"><strong>Mise à jour des données</strong></li>
+							<p style="font-size: 20px;">Mise à jour simplifié grâce à la function de nettoyage des données. </p>
+							<li style="text-align: left;font-size: 20px;"><strong>Conformité au RGPD</strong></li>
+							<p style="font-size: 20px";>La conformité au RGPD est assurée par l'absence de données personnelles.</p>
+						
+						</ol>
+					
+					</section>
+			</section>
+		</div>
+	</div>
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script src="plugin/zoom/zoom.js"></script>
+	<script>
+		Reveal.initialize({
+			hash: true,
+			transition: 'slide', // Transition par défaut pour les diapositives
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes, RevealZoom],
+			slideNumber: 'c/t',
+		});
+		hljs.initHighlightingOnLoad(); // Active le surlignage syntaxique
+	</script>
+</body>
+
+</html>
