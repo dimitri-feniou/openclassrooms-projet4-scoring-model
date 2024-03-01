@@ -11,4 +11,4 @@ dataset/POS_CASH_balance.csv
 dataset/previous_application.csv
 dataset/sample_submission.csv
 dataset
-
+.gitignore
